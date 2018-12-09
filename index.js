@@ -115,6 +115,7 @@ var FloatingLabel  = createReactClass({
 
   render() {
     var props = {
+      ref:this.props.inputRef,
         autoCapitalize: this.props.autoCapitalize,
         autoCorrect: this.props.autoCorrect,
         autoFocus: this.props.autoFocus,
