@@ -192,7 +192,7 @@ var styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     borderRadius: 4,
-    paddingLeft: 10,
+    paddingLeft: 0,
     marginTop: 20,
   },
   label: labelStyleObj
@@ -211,11 +211,11 @@ var styles = StyleSheet.create({
 FloatingLabel.defaultProps={
   cleanStyle:{
     fontSize: 16,
-    top: 7
+    top: 10
   },
   dirtyStyle:{
     fontSize: 12,
-    top: -17,
+    top: -10,
   }
 }
 module.exports = FloatingLabel;
