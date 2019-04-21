@@ -1,5 +1,5 @@
 'use strict';
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
@@ -12,8 +12,12 @@ import {
   Text,
   View,
   Platform,
-  ViewPropTypes
+  ViewPropTypes,
+  Image,
+  TouchableOpacity
 } from 'react-native';
+const SHOW = require('../../node_modules/react-native-floating-labels/view.png')
+const HIDE = require('../../node_modules/react-native-floating-labels/hide.png')
 
 var textPropTypes = Text.propTypes || ViewPropTypes
 var textInputPropTypes = TextInput.propTypes || textPropTypes
@@ -25,13 +29,14 @@ var propTypes = {
   style: ViewPropTypes.style,
 }
 
-var FloatingLabel  = createReactClass({
+var FloatingLabel = createReactClass({
   propTypes: propTypes,
 
-  getInitialState () {
+  getInitialState() {
     var state = {
       text: this.props.value,
-      dirty: (this.props.value || this.props.placeholder)
+      dirty: (this.props.value || this.props.placeholder),
+      isPasswordSecured: true
     };
 
     var style = state.dirty ? this.props.dirtyStyle : this.props.cleanStyle
@@ -43,7 +48,7 @@ var FloatingLabel  = createReactClass({
     return state
   },
 
-  componentWillReceiveProps (props) {
+  componentWillReceiveProps(props) {
     if (typeof props.value !== 'undefined' && props.value !== this.state.text) {
       this.setState({ text: props.value, dirty: !!props.value })
       this._animate(!!props.value)
@@ -67,18 +72,18 @@ var FloatingLabel  = createReactClass({
     Animated.parallel(anims).start()
   },
 
-  _onFocus () {
+  _onFocus() {
     this._animate(true)
-    this.setState({dirty: true})
+    this.setState({ dirty: true })
     if (this.props.onFocus) {
       this.props.onFocus(arguments);
     }
   },
 
-  _onBlur () {
+  _onBlur() {
     if (!this.state.text) {
       this._animate(false)
-      this.setState({dirty: false});
+      this.setState({ dirty: false });
     }
 
     if (this.props.onBlur) {
@@ -102,7 +107,7 @@ var FloatingLabel  = createReactClass({
     }
   },
 
-  _renderLabel () {
+  _renderLabel() {
     return (
       <Animated.Text
         ref='label'
@@ -112,41 +117,63 @@ var FloatingLabel  = createReactClass({
       </Animated.Text>
     )
   },
-
+  handleOnEyePress() {
+    this.setState({ isPasswordSecured: !this.state.isPasswordSecured })
+  },
+  renderPasswordShowButton() {
+    if (this.props.passwordEyeEnabled) {
+      return (
+        this.state.isPasswordSecured ?
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={this.handleOnEyePress}
+          >
+            <Image source={SHOW} style={styles.eye} />
+          </TouchableOpacity>
+          :
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={this.handleOnEyePress}
+          >
+            <Image source={HIDE} style={styles.eye} />
+          </TouchableOpacity>
+      )
+    }
+  },
   render() {
     var props = {
-      ref:this.props.inputRef,
-        autoCapitalize: this.props.autoCapitalize,
-        autoCorrect: this.props.autoCorrect,
-        autoFocus: this.props.autoFocus,
-        bufferDelay: this.props.bufferDelay,
-        clearButtonMode: this.props.clearButtonMode,
-        clearTextOnFocus: this.props.clearTextOnFocus,
-        controlled: this.props.controlled,
-        editable: this.props.editable,
-        enablesReturnKeyAutomatically: this.props.enablesReturnKeyAutomatically,
-        keyboardType: this.props.keyboardType,
-        multiline: this.props.multiline,
-        numberOfLines: this.props.numberOfLines,
-        onBlur: this._onBlur,
-        onChange: this.props.onChange,
-        onChangeText: this.onChangeText,
-        onEndEditing: this.updateText,
-        onFocus: this._onFocus,
-        onSubmitEditing: this.props.onSubmitEditing,
-        password: this.props.secureTextEntry || this.props.password, // Compatibility
-        placeholder: this.props.placeholder,
-        secureTextEntry: this.props.secureTextEntry || this.props.password, // Compatibility
-        returnKeyType: this.props.returnKeyType,
-        selectTextOnFocus: this.props.selectTextOnFocus,
-        selectionState: this.props.selectionState,
-        selectionColor: this.props.selectionColor,
-        style: [styles.input],
-        testID: this.props.testID,
-        value: this.state.text,
-        underlineColorAndroid: this.props.underlineColorAndroid, // android TextInput will show the default bottom border
-        onKeyPress: this.props.onKeyPress
-      },
+      ref: this.props.inputRef,
+      autoCapitalize: this.props.autoCapitalize,
+      autoCorrect: this.props.autoCorrect,
+      autoFocus: this.props.autoFocus,
+      bufferDelay: this.props.bufferDelay,
+      clearButtonMode: this.props.clearButtonMode,
+      clearTextOnFocus: this.props.clearTextOnFocus,
+      controlled: this.props.controlled,
+      editable: this.props.editable,
+      enablesReturnKeyAutomatically: this.props.enablesReturnKeyAutomatically,
+      keyboardType: this.props.keyboardType,
+      multiline: this.props.multiline,
+      numberOfLines: this.props.numberOfLines,
+      onBlur: this._onBlur,
+      onChange: this.props.onChange,
+      onChangeText: this.onChangeText,
+      onEndEditing: this.updateText,
+      onFocus: this._onFocus,
+      onSubmitEditing: this.props.onSubmitEditing,
+      password: ((this.props.password || this.props.secureTextEntry) && this.state.isPasswordSecured) , // Compatibility
+      placeholder: this.props.placeholder,
+      secureTextEntry: ((this.props.secureTextEntry || this.props.password) && this.state.isPasswordSecured), // Compatibility
+      returnKeyType: this.props.returnKeyType,
+      selectTextOnFocus: this.props.selectTextOnFocus,
+      selectionState: this.props.selectionState,
+      selectionColor: this.props.selectionColor,
+      style: [styles.input],
+      testID: this.props.testID,
+      value: this.state.text,
+      underlineColorAndroid: this.props.underlineColorAndroid, // android TextInput will show the default bottom border
+      onKeyPress: this.props.onKeyPress
+    },
       elementStyles = [styles.element];
 
     if (this.props.inputStyle) {
@@ -158,12 +185,13 @@ var FloatingLabel  = createReactClass({
     }
 
     return (
-  		<View style={elementStyles}>
+      <View style={elementStyles}>
         {this._renderLabel()}
         <TextInput
           {...props}
         >
         </TextInput>
+        {this.renderPasswordShowButton()}
       </View>
     );
   },
@@ -196,7 +224,22 @@ var styles = StyleSheet.create({
     paddingLeft: 0,
     marginTop: 20,
   },
-  label: labelStyleObj
+  label: labelStyleObj,
+  eye: {
+    width: 30,
+    height: 30,
+    tintColor:'#fff'
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    height:'100%',
+    justifyContent: 'center',
+    alignItems:'center',
+    paddingHorizontal:10,
+    paddingTop: 15,
+  }
 })
 
 // var cleanStyle = {
@@ -209,12 +252,12 @@ var styles = StyleSheet.create({
 //   top: -17,
 // }
 
-FloatingLabel.defaultProps={
-  cleanStyle:{
+FloatingLabel.defaultProps = {
+  cleanStyle: {
     fontSize: 16,
     top: 10
   },
-  dirtyStyle:{
+  dirtyStyle: {
     fontSize: 12,
     top: -10,
   }
